@@ -524,32 +524,6 @@ elif page == "Galaxy Map":
             )
             selected = st.plotly_chart(fig, use_container_width=True, on_select="rerun", key="galaxy_map")
 
-            # Image viewer on click/select
-            st.markdown('<div class="section-header">Selected Galaxy Viewer</div>', unsafe_allow_html=True)
-            if selected and selected.get("selection") and selected["selection"].get("points"):
-                pts = selected["selection"]["points"]
-                img_cols = st.columns(min(len(pts), 5))
-                df_master = load_master()
-                if df_master is not None:
-                    # ensure dr7objid is string in master for stable matching
-                    df_master["dr7objid_str"] = df_master["dr7objid"].astype(str)
-                    
-                for i, pt in enumerate(pts[:5]):
-                    # customdata contains the original index from labels_s
-                    # but plotly returns it as a list in pt["customdata"]
-                    if "customdata" in pt and len(pt["customdata"]) > 0:
-                        idx = pt["customdata"][0]
-                        if idx < len(labels_s) and df_master is not None:
-                            objid = str(labels_s.iloc[idx].get("dr7objid", ""))
-                            subset = df_master[df_master["dr7objid_str"] == objid]
-                            if not subset.empty:
-                                row = subset.iloc[0]
-                                img_pil = get_image(row)
-                                if img_pil:
-                                    with img_cols[i]:
-                                        st.image(img_pil, caption=f"{row['morph_class']} · z={row['redshift']:.4f}", use_container_width=True)
-            else:
-                st.info("Click on any dot in the map above to view the corresponding galaxy image here.")
 
     # Static maps for comparison
     st.markdown("---")
